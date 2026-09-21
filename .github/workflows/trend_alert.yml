@@ -1,0 +1,28 @@
+name: Gunluk Trend Bildirimi
+
+"on":
+  schedule:
+    - cron: "0 6 * * *"    # her gun UTC 06:00 = Turkiye saatiyle 09:00
+  workflow_dispatch: {}     # "Run workflow" ile elle de calistirilabilir
+
+jobs:
+  find-trends:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Trend videolari bul ve Telegram'a gonder
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          REGION_CODE: TR
+          MAX_RESULTS: "10"
+        run: python trend_finder.py
